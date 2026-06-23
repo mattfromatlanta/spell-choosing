@@ -1,14 +1,11 @@
-/* Let the content fill the (fixed-size) window so the spell-list box expands to
-   fit, instead of sitting short with empty space below it. Each level of the
-   chain is a flex column with min-height:0 so the list — and only the list —
-   scrolls. No overflow:hidden here (that previously broke the list's scrolling). */
-.application.spell-choosing .window-content {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.application.spell-choosing .window-content form {
+/* Make the whole chain from the window down to the lists a flex column that fills
+   the fixed-height window, so the list boxes fill the vertical space and only their
+   contents scroll. Every wrapper DialogV2 may insert (form, dialog-content) is
+   included — if any one isn't a flex column with min-height:0, the chain breaks and
+   the lists collapse to their content height instead of filling. */
+.application.spell-choosing .window-content,
+.application.spell-choosing .window-content > form,
+.application.spell-choosing .window-content .dialog-content {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
@@ -21,6 +18,7 @@
   flex: 1 1 auto;
   gap: 6px;
   min-height: 0;
+  padding-bottom: 8px; /* breathing room below the list boxes */
 }
 
 .sc-tabs {
@@ -73,7 +71,7 @@
   padding: 4px 0;
 }
 
-.sc-counter.over .sc-used {
+.sc-prepared-head.over .sc-used {
   color: var(--color-text-danger, #b00);
   font-weight: bold;
 }
@@ -128,11 +126,10 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  flex: 1 1 auto;
-  min-height: 0;
-  /* Safety net: if the flex chain can't bound the height for any reason, this
-     still caps the list so it scrolls rather than overflowing the window. */
-  max-height: 75vh;
+  /* flex-basis:0 → fill the column's free space exactly, regardless of how many
+     entries there are; min-height keeps it usable if the chain ever can't bound it. */
+  flex: 1 1 0;
+  min-height: 120px;
   overflow-y: auto;
   border: 1px solid var(--color-border-light-tertiary, #ccc);
   border-radius: 4px;
@@ -156,9 +153,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: 75vh;
+  flex: 1 1 0;
+  min-height: 120px;
   overflow-y: auto;
   border: 1px solid var(--color-border-light-tertiary, #ccc);
   border-radius: 4px;
@@ -170,6 +166,11 @@
   align-items: center;
   gap: 6px;
   padding: 3px 8px;
+  cursor: pointer;
+}
+
+.sc-prepared-item:hover {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .sc-prepared-item:not(:last-child) {

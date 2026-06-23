@@ -265,9 +265,8 @@ function renderClassTab(cls, pool, index, active) {
     return `
       <section class="sc-tab" data-tab="${index}" style="${active ? "" : "display:none;"}">
         <div class="sc-left">
-          <div class="sc-counter" data-class="${cls.identifier}">
-            <strong>${cls.item.name}</strong> —
-            <span class="sc-used">${used}</span> / <span class="sc-max">${cls.max}</span> prepared
+          <div class="sc-counter">
+            <strong>${cls.item.name}</strong>
             <span class="sc-source">${usesSpellbook(cls.identifier) ? "(from spellbook)" : "(from class list)"}</span>
           </div>
           <input type="search" class="sc-search" placeholder="Filter spells…" data-tab="${index}">
@@ -275,7 +274,9 @@ function renderClassTab(cls, pool, index, active) {
           <ul class="sc-list">${rows}</ul>
         </div>
         <aside class="sc-prepared">
-          <div class="sc-prepared-head">Prepared</div>
+          <div class="sc-prepared-head" data-class="${cls.identifier}">
+            Prepared — <span class="sc-used">${used}</span> / <span class="sc-max">${cls.max}</span>
+          </div>
           <ul class="sc-prepared-list" data-class="${cls.identifier}"></ul>
         </aside>
       </section>`;
@@ -333,14 +334,32 @@ function activateListeners(root, actor, classData) {
         });
     };
 
+    // Select a level tab in a section (clearing any text filter), then re-filter.
+    const activateLevel = (section, level) => {
+        if (!section) return;
+        const search = section.querySelector(".sc-search");
+        if (search) search.value = "";
+        section.querySelectorAll(".sc-leveltab").forEach(b =>
+            b.classList.toggle("active", b.dataset.level === String(level)));
+        filterSection(section);
+    };
+
     root.querySelectorAll(".sc-leveltab").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const section = btn.closest(".sc-tab");
-            // Picking a level clears any active text filter.
-            const search = section.querySelector(".sc-search");
-            if (search) search.value = "";
-            section.querySelectorAll(".sc-leveltab").forEach(b => b.classList.toggle("active", b === btn));
-            filterSection(section);
+        btn.addEventListener("click", () => activateLevel(btn.closest(".sc-tab"), btn.dataset.level));
+    });
+
+    // Clicking a spell in the right-hand "Prepared" column jumps the left list to
+    // that spell's level. Delegated, since the column is rebuilt on every sync.
+    root.querySelectorAll(".sc-prepared-list").forEach(listEl => {
+        listEl.addEventListener("click", event => {
+            const item = event.target.closest(".sc-prepared-item");
+            if (!item?.dataset.level) return;
+            const section = listEl.closest(".sc-tab");
+            activateLevel(section, item.dataset.level);
+            // Bring the matching row into view in the left list.
+            const row = section?.querySelector(`.sc-spell input[value="${CSS.escape(item.dataset.uuid)}"]`)
+                ?.closest(".sc-spell");
+            row?.scrollIntoView({ block: "nearest" });
         });
     });
 
@@ -464,7 +483,7 @@ function syncFromActor(root, actor, classData) {
         });
 
         const used = cls.item.system.spellcasting?.preparation?.value ?? 0;
-        const counter = root.querySelector(`.sc-counter[data-class="${cls.identifier}"]`);
+        const counter = root.querySelector(`.sc-prepared-head[data-class="${cls.identifier}"]`);
         if (counter) {
             const usedEl = counter.querySelector(".sc-used");
             if (usedEl) usedEl.textContent = used;
@@ -483,7 +502,7 @@ function renderPreparedColumn(root, cls, prepared) {
     prepared.sort((a, b) => (a.level - b.level) || a.name.localeCompare(b.name));
     listEl.innerHTML = prepared.length
         ? prepared.map(s => `
-            <li class="sc-prepared-item" ${spellTooltipAttrs(s.uuid)}>
+            <li class="sc-prepared-item" data-level="${s.level}" data-uuid="${s.uuid}" ${spellTooltipAttrs(s.uuid)}>
               <span class="sc-pl-lvl">${ordinalLevel(s.level)}</span>
               <span class="sc-pl-name">${s.name}</span>
               ${s.always ? `<span class="sc-tag">always</span>` : ""}
