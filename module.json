@@ -1,0 +1,22 @@
+{
+  "id": "spell-choosing",
+  "title": "Spell Preparation Helper",
+  "description": "Guides players through choosing which spells to prepare each day. Triggered automatically after a long rest, it shows the character's prepared spells in a dialog and lets them adjust the list — wizards prepare from their spellbook, while clerics, druids, paladins, and rangers prepare from the full class spell list available in the world. Enforces each class's prepared-spell limit. For D&D 5e 2024 rules.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "14"
+  },
+  "authors": [{ "name": "Matt from Atlanta" }],
+  "esmodules": ["scripts/spell-choosing.js"],
+  "styles": ["styles/spell-choosing.css"],
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": { "minimum": "5.0.0", "verified": "5.3.2" }
+      }
+    ]
+  }
+}

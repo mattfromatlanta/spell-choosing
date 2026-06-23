@@ -1,0 +1,230 @@
+/* Let the content fill the (fixed-size) window so the spell-list box expands to
+   fit, instead of sitting short with empty space below it. Each level of the
+   chain is a flex column with min-height:0 so the list — and only the list —
+   scrolls. No overflow:hidden here (that previously broke the list's scrolling). */
+.application.spell-choosing .window-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.application.spell-choosing .window-content form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.sc-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: 6px;
+  min-height: 0;
+}
+
+.sc-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--color-border-light-tertiary, #bbb);
+  padding-bottom: 4px;
+}
+
+.sc-tabbtn {
+  flex: 0 1 auto;
+  width: auto;
+  padding: 2px 10px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid transparent;
+}
+
+.sc-tabbtn.active {
+  background: var(--dnd5e-color-gold, #9f6e26);
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Two side-by-side boxes: the picker (left) and the Prepared list (right), 3:2. */
+.sc-tab {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 auto;
+  gap: 8px;
+  min-height: 0;
+}
+
+.sc-left {
+  display: flex;
+  flex-direction: column;
+  flex: 3 1 0;
+  gap: 6px;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* No batch to confirm — the dialog closes via the window X, so hide the footer. */
+.application.spell-choosing .form-footer {
+  display: none;
+}
+
+.sc-counter {
+  font-size: 1.05em;
+  padding: 4px 0;
+}
+
+.sc-counter.over .sc-used {
+  color: var(--color-text-danger, #b00);
+  font-weight: bold;
+}
+
+.sc-counter .sc-source {
+  color: #777;
+  font-size: 0.85em;
+  font-style: italic;
+}
+
+.sc-search {
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+/* Spell-level tabs: single-select row below the search box. */
+.sc-levels {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+}
+
+.sc-leveltab {
+  flex: 0 1 auto;
+  width: auto;
+  padding: 1px 8px;
+  font-size: 0.9em;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border-light-tertiary, #ccc);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.sc-leveltab.active {
+  background: var(--dnd5e-color-gold, #9f6e26);
+  color: #fff;
+  font-weight: bold;
+  border-color: transparent;
+}
+
+/* While a text filter is active, no level tab reads as selected — the search
+   spans all levels, so the level selection is set aside until the filter clears. */
+.sc-tab.searching .sc-leveltab.active {
+  background: rgba(0, 0, 0, 0.05);
+  color: inherit;
+  font-weight: normal;
+  border-color: var(--color-border-light-tertiary, #ccc);
+}
+
+.sc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  /* Safety net: if the flex chain can't bound the height for any reason, this
+     still caps the list so it scrolls rather than overflowing the window. */
+  max-height: 75vh;
+  overflow-y: auto;
+  border: 1px solid var(--color-border-light-tertiary, #ccc);
+  border-radius: 4px;
+}
+
+.sc-prepared {
+  display: flex;
+  flex-direction: column;
+  flex: 2 1 0;
+  min-height: 0;
+  min-width: 0;
+  gap: 2px;
+}
+
+.sc-prepared-head {
+  font-weight: bold;
+  padding: 2px 4px;
+}
+
+.sc-prepared-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 75vh;
+  overflow-y: auto;
+  border: 1px solid var(--color-border-light-tertiary, #ccc);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.sc-prepared-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+}
+
+.sc-prepared-item:not(:last-child) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.sc-pl-lvl {
+  flex: 0 0 auto;
+  min-width: 1.8em;
+  font-size: 0.8em;
+  color: #777;
+}
+
+.sc-pl-name {
+  flex: 1;
+}
+
+.sc-prepared-empty {
+  padding: 6px 8px;
+  color: #999;
+  font-style: italic;
+}
+
+.sc-spell label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.sc-spell:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.sc-spell.locked label {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.sc-name {
+  flex: 1;
+}
+
+.sc-school {
+  color: #777;
+  font-size: 0.85em;
+}
+
+.sc-tag {
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  padding: 1px 5px;
+  color: #555;
+}
